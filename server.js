@@ -14,7 +14,7 @@ const getModels = () => {
     const data = fs.readFileSync(modelsFilePath, "utf-8");
     return JSON.parse(data);
   } catch (err) {
-    console.error(Error reading models.json:", err);
+    console.error("Error reading models.json:", err);
     return [];
   }
 };
