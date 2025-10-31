@@ -1,33 +1,27 @@
 import express from "express";
 import cors from "cors";
-import fs from "fs/promises";
+import fs from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
 
 const app = express();
 app.use(cors());
-app.use(express.json()); 
 
 const PORT = process.env.PORT || 5001;
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const carsFilePath = path.resolve("./db.json");
+let cars = [];
 
-async function loadCars() {
-  try {
-    const data = await fs.readFile(path.resolve(__dirname, "db.json"), "utf-8");
-    return JSON.parse(data);
-  } catch (err) {
-    console.error("Failed to read db.json:", err);
-    return [];
-  }
+try {
+  const data = fs.readFileSync(carsFilePath, "utf-8");
+  cars = JSON.parse(data);
+} catch (err) {
+  console.error("Error reading db.json:", err);
 }
 
-app.get("/cars", async (req, res) => {
-  const cars = await loadCars();
-  res.json(cars);
+app.get("/", (req, res) => {
+  res.send("Shopping backend API is running. Use /cars to get the data.");
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+app.get("/cars", (req, res) => {
+  res.json(cars);
 });
