@@ -18,10 +18,12 @@ try {
   console.error("Error reading db.json:", err);
 }
 
-app.get("/", (req, res) => {
-  res.send("Shopping backend API is running. Use /cars to get the data.");
-});
-
 app.get("/cars", (req, res) => {
+  const cars = data.models.flatMap((model) =>
+    model.variants.map((v) => ({
+      ...v,
+      modelName: model.name,
+    }))
+  );
   res.json(cars);
 });
