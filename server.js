@@ -6,36 +6,31 @@ import path from "path";
 const app = express();
 app.use(cors());
 const PORT = process.env.PORT || 5001;
-const modelsFilePath = path.resolve("./models.json");
-const carsFilePath = path.resolve("./cars.json");
-
-const getModels = () => {
+const dbPath = path.resolve("./db.json");
+const readDB = () => {
   try {
-    const data = fs.readFileSync(modelsFilePath, "utf-8");
+    const data = fs.readFileSync(dbPath, "utf-8");
     return JSON.parse(data);
   } catch (err) {
-    console.error("Error reading models.json:", err);
-    return [];
+    console.error("Error reading db.json:", err);
+    return { cars: [], models: [] };
   }
 };
-
-const getCars = () => {
-  try {
-    const data = fs.readFileSync(carsFilePath, "utf-8");
-    return JSON.parse(data);
-  } catch (err) {
-    console.error("Error reading cars.json:", err);
-    return [];
-  }
-};
-app.get("/models", (req, res) => {
-  const models = getModels();
-  res.json(models);
-});
 
 app.get("/cars", (req, res) => {
-  const cars = getCars();
-  res.json(cars);
+  const db = readDB();
+  if (!Array.isArray(db.cars)) {
+    return res.status(500).json({ error: "Cars data is not an array" });
+  }
+  res.json(db.cars);
+});
+
+app.get("/models", (req, res) => {
+  const db = readDB();
+  if (!Array.isArray(db.models)) {
+    return res.status(500).json({ error: "Models data is not an array" });
+  }
+  res.json(db.models);
 });
 
 app.use((req, res) => {
